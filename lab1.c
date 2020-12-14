@@ -17,7 +17,7 @@ void *PrintHello (void *arg) {
   	args->vetor[i]++;
   }
 
-  free(arg); //aqui pode liberar a alocacao feita na main
+  free(arg);
 
   pthread_exit(NULL);
 }
@@ -25,9 +25,10 @@ void *PrintHello (void *arg) {
 //funcao principal do programa
 int main() {
   pthread_t tid_sistema[2]; //terão apenas 2 threads então 2 ids
-  int thread; //variavel auxiliar
+  int thread; 
   int vetor[100];
 
+  //ini
   for (int i = 0; i < 100; ++i){
   	vetor[i] = i;
   }
@@ -46,7 +47,7 @@ int main() {
 
     //criando as threads
     if (pthread_create(&tid_sistema[i], NULL, PrintHello, (void*) arg)) {
-      printf("--ERRO: pthread_create()\n"); exit(-1);
+      printf("Erro na pthread_create()\n"); exit(-1);
     }
   }
 
@@ -61,4 +62,5 @@ int main() {
   {
   	printf("Vetor[%d] = %d\n", i, vetor[i]);
   }
+  printf("--Thread principal encerrada--")
 }

@@ -7,7 +7,7 @@
 /* The argument now should be a double (not a pointer to a double) */
 #define GET_TIME(now) { \
    struct timespec time; \
-   clock_gettime(CLOCK_MONOTONIC, &time); \
+   clock_gettime(1, &time); \
    now = (BILLION* time.tv_sec) + time.tv_nsec; \
 }
 #endif

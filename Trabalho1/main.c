@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define inFuncaoReta x <= y
-#define inFuncaoQuadratica pow(x,2) <= y
+#define inFuncaoReta x >= y
+#define inFuncaoQuadratica pow(x,2) >= y
 #define inCircunferencia sqrt(pow(x,2)+pow(y,2)) <= 1
-#define inNoPrimitiva pow(M_E,pow(x,2)) <= y
+#define inNoPrimitiva sin(pow(x,2)) >= y
 
 int* vetorPontosDentro;
 int nPontos,nThreads;
@@ -29,8 +29,8 @@ int main(int argc, char const *argv[]){
     if(nThreads <=1){
         //area da função y = x
         for (register int i = 0; i < nPontos; i++){
-           x = (double)rand()/((double)RAND_MAX);
-           y = (double)rand()/((double)RAND_MAX);
+           x = drand48();
+           y = drand48();
            if(inFuncaoReta){qtdDentro++;}
         }
         Aproximacao = ((double)qtdDentro)/((double)nPontos);
@@ -39,8 +39,8 @@ int main(int argc, char const *argv[]){
 
         //area de 1/4 de uma circunferencia
         for (register int i = 0; i < nPontos; i++){
-           x = (double)rand()/((double)RAND_MAX);
-           y = (double)rand()/((double)RAND_MAX);
+           x = drand48();
+           y = drand48();
            if(inCircunferencia){qtdDentro++;}
         }
         Aproximacao = ((double)qtdDentro)/((double)nPontos);
@@ -49,8 +49,8 @@ int main(int argc, char const *argv[]){
 
         //area da função x²
         for (register int i = 0; i < nPontos; i++){
-           x = (double)rand()/((double)RAND_MAX);
-           y = (double)rand()/((double)RAND_MAX);
+           x = drand48();
+           y = drand48();
            if(inFuncaoQuadratica){qtdDentro++;}
         }
         Aproximacao = ((double)qtdDentro)/((double)nPontos);
@@ -59,12 +59,14 @@ int main(int argc, char const *argv[]){
 
         //area da função e^(x^2) M_E
         for (register int i = 0; i < nPontos; i++){
-           x = (double)rand()/((double)RAND_MAX);
-           y = (double)rand()/((double)RAND_MAX);
-           if(inNoPrimitiva){qtdDentro++;}
+           x = drand48();
+           y = drand48();
+           if(inNoPrimitiva){
+               qtdDentro++;
+           }
         }
         Aproximacao = ((double)qtdDentro)/((double)nPontos);
-        printf("A aproximação da area da função y = e^(x^2) delimitada entre [0,1] é: %lf\n",Aproximacao);
+        printf("A aproximação da area da função y = seno(x^2) delimitada entre [0,1] é: %lf\n",Aproximacao);
     }
     
     

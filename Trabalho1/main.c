@@ -4,7 +4,7 @@
 #include <math.h>
 
 #define inFuncaoReta x <= y
-#define inFuncaoQuadratica pow(x,2) >= y
+#define inFuncaoQuadratica pow(x,2) <= y
 #define inCircunferencia sqrt(pow(x,2)+pow(y,2)) <= 1
 #define inNoPrimitiva pow(M_E,pow(x,2)) <= y
 

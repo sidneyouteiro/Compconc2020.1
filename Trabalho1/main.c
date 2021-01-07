@@ -8,13 +8,32 @@
 #define inCircunferencia sqrt(pow(x,2)+pow(y,2)) <= 1
 #define inNoPrimitiva sin(pow(x,2)) >= y
 
-int* vetorPontosDentro;
+typedef struct{
+    int resultParcialReta;
+    int resultParcialQuadratica;
+    int resultParcialCircunferencia;
+    int resultParcialNoPrimitiva;
+}ResultParciais;
+
+
+ResultParciais* vetorResult;
 int nPontos,nThreads;
 
-void zeraVetorPontosDentro(){
-    for(register int i=0;i<nPontos;i++){
-        vetorPontosDentro[i]=0;
+void* MontCarlo(void* i){
+    double x,y;
+    long int numThread = (long int)i;
+    int qtdPontos = nPontos/nThreads;
+    if(numThread == nThreads-1 && (nPontos%nThreads)!=0){qtdPontos=nPontos%nThreads;}
+    for (register int i = 0; i < qtdPontos; i++){
+        x = drand48();
+        y = drand48();
+        if(inFuncaoReta){vetorResult[numThread].resultParcialReta++;}
+        if(inFuncaoQuadratica){vetorResult[numThread].resultParcialQuadratica++;}
+        if(inCircunferencia){vetorResult[numThread].resultParcialCircunferencia++;}
+        if(inNoPrimitiva){vetorResult[numThread].resultParcialNoPrimitiva++;}
+        
     }
+    
 }
 
 int main(int argc, char const *argv[]){
@@ -27,6 +46,7 @@ int main(int argc, char const *argv[]){
     
     
     if(nThreads <=1){
+        ResultParciais resultTot;
         //area da função y = x
         for (register int i = 0; i < nPontos; i++){
            x = drand48();
@@ -68,7 +88,44 @@ int main(int argc, char const *argv[]){
         Aproximacao = ((double)qtdDentro)/((double)nPontos);
         printf("A aproximação da area da função y = seno(x^2) delimitada entre [0,1] é: %lf\n",Aproximacao);
     }
-    
-    
+    else{
+        pthread_t tid_array[nThreads];
+        vetorResult = malloc(sizeof(ResultParciais)*nThreads);
+        for (register int i = 0; i < nThreads; i++){
+            vetorResult[i].resultParcialReta=0;
+            vetorResult[i].resultParcialQuadratica=0;
+            vetorResult[i].resultParcialCircunferencia=0;
+            vetorResult[i].resultParcialNoPrimitiva=0;
+        }        
+
+        for (register long int i = 0; i < nThreads; i++){
+            if(pthread_create(&tid_array[i],NULL,MontCarlo,(void*)i)){printf("PTHREAD_CREATE -- ERRO");return 2;}
+        }
+
+        for (register int i = 0; i < nThreads; i++){
+            if(pthread_join(tid_array[i],NULL)){printf("PTHREAD_JOIN -- ERRO");return 3;}
+        }
+        
+        int qtdDentroReta=0, qtdDentroQuadratica=0, qtdDentroCircunferencia=0, qtdDentroNoPrimitiva=0;
+        double totPontos= (double)nPontos;
+        double totReta,totQuadratica,totCircunferencia,totNoPrimitiva;
+        for (register int i = 0; i < nThreads; i++){
+            qtdDentroReta+=vetorResult[i].resultParcialReta;
+            qtdDentroQuadratica+=vetorResult[i].resultParcialQuadratica;
+            qtdDentroCircunferencia+=vetorResult[i].resultParcialCircunferencia;
+            qtdDentroNoPrimitiva+=vetorResult[i].resultParcialNoPrimitiva;
+        }
+        totReta=(double)qtdDentroReta/totPontos;
+        totQuadratica=(double)qtdDentroQuadratica/totPontos;
+        totCircunferencia=(double)qtdDentroCircunferencia/totPontos;
+        totNoPrimitiva=(double)qtdDentroNoPrimitiva/totPontos;
+
+        printf("A aproximação da area da função y = x delimitada entre [0,1] é: %lf\n",totReta);
+        printf("A aproximação da area do primeiro quadrante de uma circunferencia é: %lf\n",totCircunferencia);
+        printf("A aproximação da area da função y = x² delimitada entre [0,1] é: %lf\n",totQuadratica);
+        printf("A aproximação da area da função y = seno(x^2) delimitada entre [0,1] é: %lf\n",totNoPrimitiva);
+
+        free(vetorResult);
+    }
     return 0;
 }

@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <math.h>
+#include "timer.h"
 
 #define inFuncaoReta x >= y
 #define inFuncaoQuadratica pow(x,2) >= y
@@ -43,10 +44,11 @@ int main(int argc, char const *argv[]){
     
     int qtdDentro=0;
     double x, y,Aproximacao;
-    
+    double start,finish;
     
     if(nThreads <=1){
         ResultParciais resultTot;
+        GET_TIME(start);
         //area da função y = x
         for (register int i = 0; i < nPontos; i++){
            x = drand48();
@@ -87,6 +89,8 @@ int main(int argc, char const *argv[]){
         }
         Aproximacao = ((double)qtdDentro)/((double)nPontos);
         printf("A aproximação da area da função y = seno(x^2) delimitada entre [0,1] é: %lf\n",Aproximacao);
+        GET_TIME(finish);
+        printf("Tempo de execução (sequencial): %lf",finish-start);
     }
     else{
         pthread_t tid_array[nThreads];
@@ -97,7 +101,7 @@ int main(int argc, char const *argv[]){
             vetorResult[i].resultParcialCircunferencia=0;
             vetorResult[i].resultParcialNoPrimitiva=0;
         }        
-
+        GET_TIME(start);
         for (register long int i = 0; i < nThreads; i++){
             if(pthread_create(&tid_array[i],NULL,MontCarlo,(void*)i)){printf("PTHREAD_CREATE -- ERRO");return 2;}
         }
@@ -105,7 +109,7 @@ int main(int argc, char const *argv[]){
         for (register int i = 0; i < nThreads; i++){
             if(pthread_join(tid_array[i],NULL)){printf("PTHREAD_JOIN -- ERRO");return 3;}
         }
-        
+        GET_TIME(finish);
         int qtdDentroReta=0, qtdDentroQuadratica=0, qtdDentroCircunferencia=0, qtdDentroNoPrimitiva=0;
         double totPontos= (double)nPontos;
         double totReta,totQuadratica,totCircunferencia,totNoPrimitiva;
@@ -124,6 +128,7 @@ int main(int argc, char const *argv[]){
         printf("A aproximação da area do primeiro quadrante de uma circunferencia é: %lf\n",totCircunferencia);
         printf("A aproximação da area da função y = x² delimitada entre [0,1] é: %lf\n",totQuadratica);
         printf("A aproximação da area da função y = seno(x^2) delimitada entre [0,1] é: %lf\n",totNoPrimitiva);
+        printf("Tempo de execução das threads (concorrente): %lf \n ",finish-start);
 
         free(vetorResult);
     }

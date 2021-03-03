@@ -154,9 +154,9 @@ class Worker extends Thread {
 
 public class Main{
     //quantidade threads
-    static final int num_workers = 2;
+    static final int num_workers = 4;
     //tamanho do array
-    static final int array_size = 10000;
+    static final int array_size = 100000;
     
 	public static void main(String[] args) {
 	    System.out.println("Começando o programa!");
@@ -199,7 +199,7 @@ public class Main{
 
 		buffer.print_buffer();
 	
-	    System.out.println(Arrays.toString(array));
+	    //System.out.println(Arrays.toString(array));
 
         System.out.println("Duração(nanosegundos) do programa concorrente "+duration);
 
